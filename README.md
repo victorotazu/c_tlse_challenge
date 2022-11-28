@@ -1,6 +1,6 @@
 # c_tlse_challenge
 ## Goal
-Build a serverless API that, given an IP, returns enriched data
+Build a serverless API that, given an IP, returns geolocation data
 
 ## Components
 - AWS Lambda to do the work
@@ -13,3 +13,4 @@ request --> AWS Gateway --> AWS Lambda (golang) --> External API to enrich data
 ## TODO
 - Add unit tests
 - Implement a fallback option in case the external api is down. One option could be MindMax's database
+- Restrict the calls so it only accepts GET /queries/{ip}
