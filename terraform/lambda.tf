@@ -13,8 +13,14 @@ resource "aws_lambda_function" "ipquery" {
   # "main" is the filename within the zip file (main.zip)
   handler = "main"
   runtime = "go1.x"
-
+  memory_size = 256
   role = "${aws_iam_role.lambda_exec.arn}"
+
+  environment {
+    variables = {
+      extapikey = data.aws_secretsmanager_secret_version.secret_credentials.secret_string
+    }
+  }
 }
 
 # AWS services the Lambda function can access.
@@ -65,4 +71,12 @@ resource "aws_lambda_permission" "apigw" {
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_api_gateway_rest_api.ipquery.execution_arn}/*/*"
+}
+
+data "aws_secretsmanager_secret" "secret_name" {
+   name = "test/ipquery/extapikey"
+}
+
+data "aws_secretsmanager_secret_version" "secret_credentials" {
+  secret_id = data.aws_secretsmanager_secret.secret_name.id
 }
