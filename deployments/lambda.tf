@@ -13,7 +13,7 @@ resource "aws_lambda_function" "ipquery" {
   # "main" is the filename within the zip file (main.zip)
   handler = "main"
   runtime = "go1.x"
-  memory_size = 256
+  memory_size = 128
   role = "${aws_iam_role.lambda_exec.arn}"
 
   environment {
@@ -73,6 +73,7 @@ resource "aws_lambda_permission" "apigw" {
   source_arn = "${aws_api_gateway_rest_api.ipquery.execution_arn}/*/*"
 }
 
+# Secret manager config for external api key
 data "aws_secretsmanager_secret" "secret_name" {
    name = "test/ipquery/extapikey"
 }

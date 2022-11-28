@@ -3,12 +3,14 @@ resource "aws_api_gateway_rest_api" "ipquery" {
   description = "API Gateway to execute lambda fn"
 }
 
+#resource
 resource "aws_api_gateway_resource" "proxy" {
   rest_api_id = "${aws_api_gateway_rest_api.ipquery.id}"
   parent_id   = "${aws_api_gateway_rest_api.ipquery.root_resource_id}"
   path_part   = "{proxy+}"
 }
 
+# method
 resource "aws_api_gateway_method" "proxy" {
   rest_api_id   = "${aws_api_gateway_rest_api.ipquery.id}"
   resource_id   = "${aws_api_gateway_resource.proxy.id}"
@@ -16,6 +18,7 @@ resource "aws_api_gateway_method" "proxy" {
   authorization = "NONE"
 }
 
+# integration, using AWS_PROXY for convenience
 resource "aws_api_gateway_integration" "lambda" {
   rest_api_id = "${aws_api_gateway_rest_api.ipquery.id}"
   resource_id = "${aws_api_gateway_method.proxy.resource_id}"
@@ -26,6 +29,7 @@ resource "aws_api_gateway_integration" "lambda" {
   uri                     = "${aws_lambda_function.ipquery.invoke_arn}"
 }
 
+# now the same but for root
 resource "aws_api_gateway_method" "proxy_root" {
   rest_api_id   = "${aws_api_gateway_rest_api.ipquery.id}"
   resource_id   = "${aws_api_gateway_rest_api.ipquery.root_resource_id}"
@@ -43,6 +47,7 @@ resource "aws_api_gateway_integration" "lambda_root" {
   uri                     = "${aws_lambda_function.ipquery.invoke_arn}"
 }
 
+# deployment
 resource "aws_api_gateway_deployment" "ipquery" {
   depends_on = [
     "aws_api_gateway_integration.lambda",
@@ -52,6 +57,7 @@ resource "aws_api_gateway_deployment" "ipquery" {
   rest_api_id = "${aws_api_gateway_rest_api.ipquery.id}"
   stage_name  = "test"
 }
+
 
 output "base_url" {
   value = "${aws_api_gateway_deployment.ipquery.invoke_url}"
